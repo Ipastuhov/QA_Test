@@ -1,0 +1,86 @@
+class AddContactPage {
+    constructor(page) {
+        this.page = page;
+    }
+
+    // Селекторы для полей ввода
+    get firstNameInput() { return this.page.locator('#firstName'); }
+    get lastNameInput() { return this.page.locator('#lastName'); }
+    get birthdateInput() { return this.page.locator('#birthdate'); }
+    get emailInput() { return this.page.locator('#email'); }
+    get phoneInput() { return this.page.locator('#phone'); }
+    get street1Input() { return this.page.locator('#street1'); }
+    get street2Input() { return this.page.locator('#street2'); }
+    get cityInput() { return this.page.locator('#city'); }
+    get stateProvinceInput() { return this.page.locator('#stateProvince'); }
+    get postalCodeInput() { return this.page.locator('#postalCode'); }
+    get countryInput() { return this.page.locator('#country'); }
+    
+    get submitButton() { return this.page.locator('#submit'); }
+    get cancelButton() { return this.page.locator('#cancel'); }
+    get logoutButton() { return this.page.locator('#logout'); }
+    get errorMessage() { return this.page.locator('#error'); }
+
+    // взимодействие с элементами страницы
+    async fillFirstName(firstName) {
+        await this.firstNameInput.fill(firstName);
+    }
+
+    async fillLastName(lastName) {
+        await this.lastNameInput.fill(lastName);
+    }
+
+    async fillBirthdate(birthdate) {
+        await this.birthdateInput.fill(birthdate);
+    }
+
+    async fillEmail(email) {
+        await this.emailInput.fill(email);
+    }
+
+    async fillPhone(phone) {
+        await this.phoneInput.fill(phone);
+    }
+
+    async fillStreet1(street1) {
+        await this.street1Input.fill(street1);
+    }
+
+    async fillStreet2(street2) {
+        await this.street2Input.fill(street2);
+    }
+
+    async fillCity(city) {
+        await this.cityInput.fill(city);
+    }
+
+    async fillStateProvince(state) {
+        await this.stateProvinceInput.fill(state);
+    }
+
+    async fillPostalCode(postalCode) {
+        await this.postalCodeInput.fill(postalCode);
+    }
+
+    async fillCountry(country) {
+        await this.countryInput.fill(country);
+    }
+
+    async clickSubmit() {
+        await this.submitButton.click();
+    }
+
+    async clickCancel() {
+        await this.cancelButton.click();
+    }
+
+    async clickLogout() {
+        await this.logoutButton.click();
+    }
+
+    async getErrorMessageText() {
+        return await this.errorMessage.textContent();
+    }
+}
+
+module.exports = AddContactPage;

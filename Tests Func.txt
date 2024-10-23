@@ -1,0 +1,105 @@
+const { test, expect } = require('@playwright/test');
+const AddContactPage = require('./addContact.page');
+
+test.describe('Add Contact Page Functionality', () => {
+    let addContactPage;
+
+    test.beforeEach(async ({ page }) => {
+        await page.goto('https://thinking-tester-contact-list.herokuapp.com/addContact');
+        addContactPage = new AddContactPage(page);
+    });
+
+    // 1. Проверка загрузки страницы
+    test('should load the Add Contact page', async () => {
+        const title = await page.title();
+        expect(title).toContain('Add Contact');
+    });
+
+    // 2. Проверка обязательных полей (например First Name)
+    test('should show alert when mandatory fields are not filled', async () => {
+        await addContactPage.clickSubmit();
+
+        const errorMessage = await addContactPage.getErrorMessageText();
+        expect(errorMessage).toContain('undefined'); 
+    });
+
+    // 3. Проверка валидации формата email
+    test('should show an error for invalid email format', async () => {
+        await addContactPage.fillFirstName('Иван');
+        await addContactPage.fillLastName('Пастухов');
+        await addContactPage.fillEmail('qatestmail');
+        await addContactPage.clickSubmit();
+        const errorMessage = await addContactPage.getErrorMessageText();
+        expect(errorMessage).toContain('undefined');
+    });
+
+    // 4. Проверка успешного добавления контакта
+    test('should successfully add a contact with valid details', async () => {
+        await addContactPage.fillFirstName('Иван');
+        await addContactPage.fillLastName('Пастухов');
+        await addContactPage.fillBirthdate('1997-08-14');
+        await addContactPage.fillEmail('qa.test1111@gmail.com');
+        await addContactPage.fillPhone('8005551234');
+        await addContactPage.fillStreet1('Black');
+        await addContactPage.fillStreet2('White');
+        await addContactPage.fillCity('Moscow');
+        await addContactPage.fillStateProvince('California');
+        await addContactPage.fillPostalCode('12345');
+        await addContactPage.fillCountry('USA');
+        await addContactPage.clickSubmit();
+
+        const successMessage = await page.locator('Status Code: 200 OK').textContent(); 
+        expect(successMessage).toContain('Click on any contact to view the Contact Details');
+    });
+
+    // 5. Проверка сброса формы при нажатии Cancel
+    test('should navigate to contact list when Cancel is clicked', async () => {
+        await addContactPage.clickCancel();
+        expect(page.url()).toBe('https://thinking-tester-contact-list.herokuapp.com/contactList');
+    });
+
+    // 6. Проверка заполнения полей FirstName и LastName
+    test('should allow filling in all relevant fields', async () => {
+        await addContactPage.fillFirstName('Иван');
+        await addContactPage.fillLastName('Пастухов');
+        expect(await addContactPage.firstNameInput.inputValue()).toBe('Иван');
+        expect(await addContactPage.lastNameInput.inputValue()).toBe('Пастухов');
+    });
+
+    // 7. Проверка нажатия на кнопку "Logout"
+    test('should navigate to logout when Logout button is clicked', async () => {
+        await addContactPage.clickLogout();
+        expect(page.url()).toContain('/logout');
+    });
+
+    // 8. Проверка, что поля очищаются после успешного добавления
+    test('should clear the fields after successful submission', async () => {
+        await addContactPage.fillFirstName('Clear Test');
+        await addContactPage.fillLastName('User');
+        await addContactPage.clickSubmit();
+
+        expect(await addContactPage.firstNameInput.inputValue()).toBe('');
+        expect(await addContactPage.lastNameInput.inputValue()).toBe('');
+    });
+
+    // 9. Проверка поведения при дублирующемся email
+    test('should show error when email is already in use', async () => {
+        await addContactPage.fillFirstName('Иван');
+        await addContactPage.fillLastName('Пастухов');
+        await addContactPage.fillEmail('qa.test1111@gmail.com'); // Существующий email
+        await addContactPage.clickSubmit();
+        const errorMessage = await addContactPage.getErrorMessageText();
+        expect(errorMessage).toContain('Email already in use'); // Наш проект позволяет добавить пользователя с одинаковыми email, но можно предположить, что при отсутствии такой возможности - у нас будет такого формата сообщение об ошибке
+    });
+
+    // 10. Проверка отображения сообщения об успешном добавлении
+     test('should display success message after adding a contact', async () => {
+        await addContactPage.fillFirstName('Иван');
+        await addContactPage.fillLastName('Пастухов');
+        await addContactPage.fillEmail('success.user@example.com');
+        await addContactPage.clickSubmit(); // Чтобы добавить пользователя - не обязательно заполнять все поля, достаточно двух полей с именами 
+
+        const successMessage = await page.locator('Status Code: 200 OK').textContent(); // Замените на реальный селектор
+        expect(successMessage).toContain('Click on any contact to view the Contact Details'); 
+    });
+});
